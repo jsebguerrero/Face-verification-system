@@ -1,17 +1,19 @@
-from PIL import Image
-from numpy import asarray
-import numpy as np
-from mtcnn.mtcnn import MTCNN
-from os import listdir
+from PIL import Image # Module that contains functions to manage images
+from numpy import asarray # Module to converts inputs in arrays
+import numpy as np # Fundamental package
+from mtcnn.mtcnn import MTCNN #  MTCNN package
+from os import listdir # Used for common path manipulation
 from os.path import isdir
-import os
+import os # Provides functions for interacting with the operating system
 
 # create the detector, using default weights
 detector = MTCNN()
 print('MTCNN detector loaded')
 
+# --------------------------------------------------------------------------
+# -- Extract a single face from a given photograph in filesystem  ----------
+# --------------------------------------------------------------------------
 
-# extract a single face from a given photograph in filesystem
 def extract_face(filename, required_size=(160, 160)):
     # load image from file
     image = Image.open(filename)
@@ -25,7 +27,7 @@ def extract_face(filename, required_size=(160, 160)):
     results = detector.detect_faces(pixels)
     # extract the bounding box from the first face
     x1, y1, width, height = results[0]['box']
-    # bug fix
+    # bug fix (negative pixel index)
     x1, y1 = abs(x1), abs(y1)
     x2, y2 = x1 + width, y1 + height
     # extract the face
@@ -37,7 +39,10 @@ def extract_face(filename, required_size=(160, 160)):
     return face_array, x1, y1, width, height
 
 
-# extract a single face from a given photograph
+# --------------------------------------------------------------------------
+# -- Extract a single face from a given photograph  ------------------------
+# --------------------------------------------------------------------------
+    
 def extract_face_image(photo, required_size=(160, 160)):
     # convert to array
     pixels = asarray(photo)
@@ -48,7 +53,7 @@ def extract_face_image(photo, required_size=(160, 160)):
     results = detector.detect_faces(pixels)
     # extract the bounding box from the first face
     x1, y1, width, height = results[0]['box']
-    # bug fix
+    # bug fix (negative pixel index)
     x1, y1 = abs(x1), abs(y1)
     x2, y2 = x1 + width, y1 + height
     # extract the face
@@ -59,8 +64,10 @@ def extract_face_image(photo, required_size=(160, 160)):
     face_array = asarray(image)
     return face_array, x1, y1, width, height
 
-
-# load images and extract faces for all images in a directory
+# --------------------------------------------------------------------------
+# -- Load images and extract faces for all images in a directory  ----------
+# --------------------------------------------------------------------------
+    
 def load_faces(directory):
     faces = list()
     # enumerate files
@@ -74,7 +81,11 @@ def load_faces(directory):
     return faces
 
 
-# load a dataset that contains one subdir for each class that in turn contains images
+# --------------------------------------------------------------------------
+# -- load a dataset that contains one subdir for each class that in  -------
+# -- turn contains images  -------------------------------------------------
+# --------------------------------------------------------------------------
+    
 def load_dataset(directory):
     X, y = list(), list()
     # enumerate folders, on per class
@@ -96,7 +107,10 @@ def load_dataset(directory):
 
     return asarray(X), asarray(y)
 
-
+# --------------------------------------------------------------------------
+# -- Load a dataset of images from a subdir  -------------------------------
+# --------------------------------------------------------------------------
+    
 def load_dataset_person(directory):
     X, y = list(), list()
     # load all faces in the subdirectory
@@ -110,8 +124,9 @@ def load_dataset_person(directory):
 
     return asarray(X), asarray(y)
 
-
-# get the face embedding for one face
+# --------------------------------------------------------------------------
+# -- Get the face embedding for one face  ----------------------------------
+# --------------------------------------------------------------------------
 def get_embedding(model, face_pixels):
     # scale pixel values
     face_pixels = face_pixels.astype('float32')
@@ -124,8 +139,9 @@ def get_embedding(model, face_pixels):
     yhat = model.predict(samples)
     return yhat[0]
 
-
-# create directory for new face
+# --------------------------------------------------------------------------
+# -- Create directory for new face  ----------------------------------------
+# --------------------------------------------------------------------------
 def create_dir(path):
     if os.path.isdir(path):
         pass

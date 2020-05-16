@@ -1,4 +1,4 @@
-# develop a classifier for the 5 Celebrity Faces Dataset
+ # develop a classifier for the 5 Celebrity Faces Dataset
 from random import choice
 from numpy import load
 from numpy import expand_dims
@@ -7,25 +7,30 @@ from sklearn.preprocessing import Normalizer
 from sklearn.svm import SVC
 from matplotlib import pyplot
 import pickle
-# load faces
+
+# --------------------------------------------------------------------------
+# --  Train the SVM for the Faces Dataset ----------------------------------
+# --------------------------------------------------------------------------
+
+# Load faces dataset file
 data = load('dataset.npz')
 testX_faces = data['arr_2']
-# load face embeddings
+# Load face embeddings file
 data = load('dataset-embeddings.npz')
 trainX, trainy, testX, testy = data['arr_0'], data['arr_1'], data['arr_2'], data['arr_3']
-# normalize input vectors
+# Normalize input vectors with l2 normalization
 in_encoder = Normalizer(norm='l2')
 trainX = in_encoder.transform(trainX)
 testX = in_encoder.transform(testX)
-# label encode targets
+# Label encode targets
 out_encoder = LabelEncoder()
 out_encoder.fit(trainy)
 trainy = out_encoder.transform(trainy)
 testy = out_encoder.transform(testy)
-# fit model
+# Fit model
 model = SVC(kernel='linear', probability=True)
 model.fit(trainX, trainy)
-# save the model to disk
+# Save the model to disk
 filename = './model/svm_linear.sav'
 pickle.dump(model, open(filename, 'wb'))
 filename = './model/label_encoder.sav'
