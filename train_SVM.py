@@ -11,6 +11,11 @@ from sklearn.metrics import multilabel_confusion_matrix
 from sklearn.svm import SVC
 import matplotlib.pyplot as plt
 import pickle
+
+# --------------------------------------------------------------------------
+# --  Train the SVM for the Faces Dataset ----------------------------------
+# --------------------------------------------------------------------------
+
 # load faces
 data = load('dataset.npz',allow_pickle=True)
 testX_faces = data['arr_2']
@@ -36,9 +41,15 @@ model = OneVsRestClassifier(SVC(kernel='linear', probability=True))
 #model.fit(trainX, trainy)
 y_score = model.fit(trainX, trainy).decision_function(testX)
 y_pred = model.predict(testX)
-# Compute ROC curve and ROC area for each class
+
+# --------------------------------------------------------------------------
+# --  Compute ROC curve and ROC area for each class ------------------------
+# --------------------------------------------------------------------------
+
+# Compute a confusion matrix for each class
 confussion_matrix = multilabel_confusion_matrix(testy, y_pred)
 j = 0
+# Print the number of samples that belong to each class
 for cmatrix in confussion_matrix:
     cmatrix = cmatrix.ravel()
     print('class : ',j)
@@ -47,10 +58,12 @@ for cmatrix in confussion_matrix:
     print('falsos negativos', cmatrix[2])
     print('verdaderos negativos', cmatrix[3])
     j += 1
-
+# Dictionary object 
 fpr = dict()
 tpr = dict()
 roc_auc = dict()
+
+# Obtain the roc curve and its AUC
 for i in range(n_classes):
     fpr[i], tpr[i], _ = roc_curve(testy[:, i], y_score[:, i])
     roc_auc[i] = auc(fpr[i], tpr[i])
@@ -60,14 +73,14 @@ for i in range(n_classes):
     plt.figure()
     plt.plot(fpr[i], tpr[i], label='ROC curve (area = %0.2f)' % roc_auc[i])
     plt.plot([0, 1], [0, 1], 'k--')
-    plt.xlim([0.0, 1.0])
+    plt.xlim([0.0, 1.0])    
     plt.ylim([0.0, 1.05])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.title('Receiver operating characteristic example')
     plt.legend(loc="lower right")
     plt.show()
-# save the model to disk
+
 """
 filename = './model/svm_linear.sav'
 pickle.dump(model, open(filename, 'wb'))
