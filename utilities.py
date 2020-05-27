@@ -36,7 +36,7 @@ def extract_face(filename, required_size=(160, 160)):
     image = Image.fromarray(face)
     image = image.resize(required_size)
     face_array = asarray(image)
-    return face_array, x1, y1, width, height
+    return face_array
 
 
 # --------------------------------------------------------------------------
